@@ -2,10 +2,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <time.h>
+#include "TicTacToe.h"
 
 using namespace std;
 
-void printboard(char* board) {
+void TicTacToe::printboard() {
     for (int y = 0; y < 3; y++) { // A line
         cout << "\t";
         for (int x = 0; x < 3; x++) { // An entry
@@ -15,30 +16,17 @@ void printboard(char* board) {
     }
 }
 
-int main() {
-    const char X = 'X', O = 'O', SPACE = '.';
-
-    //Set up board like this:
-    //{.,.,.,
-    // .,.,.,
-    // .,.,.}
-
-    //00 01 02
-    //03 04 05
-    //06 07 08
-
-    char board[9];
-
+TicTacToe::TicTacToe(Player p1, Player p2) : first(p1), second(p2) {
     for (int i = 0; i < 9; i++) board[i] = SPACE;
+}
 
-    char currentPlayer = X;
-    bool won = false, moreMoves = true;
 
+void TicTacToe::play() {
     //Do many turns
     do {
         //Draw the board
-        printboard(board);
-        cout << "Please place an " << currentPlayer << " by choosing 0 to 8." << endl;
+        printboard();
+        cout << "It is " << currentPlayer->getName() <<"'s turn. Please place an " << getCurrentPlayerSymbol() << " by choosing 0 to 8." << endl;
 
         //Get a play
         int play;
@@ -54,7 +42,7 @@ int main() {
             cout << "Position " << play << " is already occupied!" << endl;
             continue;
         }
-        board[play] = currentPlayer;
+        board[play] = getCurrentPlayerSymbol();
 
         for (int y = 0; y < 3; y++) { // Checking Rows
             won |= (board[0 + y * 3] != SPACE) && (board[0 + y * 3] == board[1 + y * 3]) && (board[1 + y * 3] == board[2 + y * 3]);
@@ -70,21 +58,23 @@ int main() {
             moreMoves |= (board[i] == SPACE);
         }
 
-        if (currentPlayer == X) currentPlayer = O;
-        else currentPlayer = X;
+        if (!won) {
+            if (currentPlayer == &first) currentPlayer = &second;
+            else currentPlayer = &first;
+        }
     } while (!won && moreMoves);
 
     //Draw the final board
-    printboard(board);
+    printboard();
 
     //Declare winner, if someone won
     if (won) {
-        if (currentPlayer == X) cout << O << " won!" << endl;
-        else cout << X << " won!" << endl;
+        cout << currentPlayer->getName() << " won!" << endl;
     } // Declare Tie if nobody won
     else if (!moreMoves) cout << "Tie Game!" << endl;
 
-    getchar();
+}
 
-    return 0;
+char TicTacToe::getCurrentPlayerSymbol(){
+    return (currentPlayer == &first) ? X : O;
 }
